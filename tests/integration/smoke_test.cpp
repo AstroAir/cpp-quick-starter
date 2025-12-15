@@ -2,7 +2,8 @@
 
 #include <gtest/gtest.h>
 
-TEST(Integration, Smoke) {
+TEST(Integration, Smoke)
+{
   const auto msg = project_name::core::greeting("integration");
   EXPECT_FALSE(msg.empty());
 }

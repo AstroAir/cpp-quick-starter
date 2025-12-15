@@ -73,6 +73,7 @@ vcpkg_installed/
 
 ## Caches
 .cache/
+.xmake/
 
 ## Coverage / profiling outputs
 *.gcda

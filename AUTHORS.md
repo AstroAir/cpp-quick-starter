@@ -10,7 +10,7 @@ This file lists the authors and contributors of cpp-quick-starter.
 
 Thanks to all the people who have contributed to this project!
 
-<!-- 
+<!--
 Add contributors here in the format:
 - **Name** - *Contribution description* - [@username](https://github.com/username)
 -->

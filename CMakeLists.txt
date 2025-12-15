@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 3.21)
 
+if(POLICY CMP0135)
+  cmake_policy(SET CMP0135 NEW)
+endif()
+
 project(cpp_quick_starter VERSION 0.1.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -23,7 +27,13 @@ option(CPP_QUICK_STARTER_BUILD_DOCS "Build docs (Doxygen)" OFF)
 
 option(CPP_QUICK_STARTER_ENABLE_MKDOCS "Enable MkDocs targets" ON)
 
-option(CPP_QUICK_STARTER_USE_SYSTEM_GTEST "Use system-installed GTest instead of FetchContent" OFF)
+set(_cpp_quick_starter_default_use_system_packages OFF)
+if(MINGW)
+  set(_cpp_quick_starter_default_use_system_packages ON)
+endif()
+
+option(CPP_QUICK_STARTER_USE_SYSTEM_GTEST "Use system-installed GTest instead of FetchContent" ${_cpp_quick_starter_default_use_system_packages})
+option(CPP_QUICK_STARTER_USE_SYSTEM_BENCHMARK "Use system-installed benchmark instead of FetchContent" ${_cpp_quick_starter_default_use_system_packages})
 
 add_library(cpp_quick_starter
   src/core/greeting.cpp
@@ -91,7 +101,14 @@ if(CPP_QUICK_STARTER_BUILD_TESTS)
 endif()
 
 if(CPP_QUICK_STARTER_BUILD_BENCHMARKS)
-  find_package(benchmark CONFIG QUIET)
+  set(_cpp_quick_starter_use_system_benchmark ${CPP_QUICK_STARTER_USE_SYSTEM_BENCHMARK})
+  if(MSVC)
+    set(_cpp_quick_starter_use_system_benchmark OFF)
+  endif()
+
+  if(_cpp_quick_starter_use_system_benchmark)
+    find_package(benchmark CONFIG QUIET)
+  endif()
   if(NOT benchmark_FOUND)
     FetchContent_Declare(benchmark
       URL https://github.com/google/benchmark/archive/refs/tags/v1.8.4.zip

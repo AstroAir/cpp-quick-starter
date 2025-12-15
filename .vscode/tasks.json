@@ -2,13 +2,35 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "uv Sync (docs)",
+      "label": "uv Sync (workspace)",
       "type": "shell",
       "command": "uv",
-      "args": ["sync", "--group", "docs"],
+      "args": ["sync", "--group", "docs", "--group", "dev"],
       "options": {
         "cwd": "${workspaceFolder}"
       },
+      "problemMatcher": []
+    },
+    {
+      "label": "pre-commit (all files)",
+      "type": "shell",
+      "command": "uv",
+      "args": ["run", "pre-commit", "run", "--all-files"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "dependsOn": ["uv Sync (workspace)"],
+      "problemMatcher": []
+    },
+    {
+      "label": "pre-commit Install Hooks",
+      "type": "shell",
+      "command": "uv",
+      "args": ["run", "pre-commit", "install"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "dependsOn": ["uv Sync (workspace)"],
       "problemMatcher": []
     },
     {
@@ -16,6 +38,22 @@
       "type": "shell",
       "command": "cmake",
       "args": ["--preset", "vs-debug"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "CMake Configure (clangd-msvc)",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "$vsDevCmd = Join-Path $env:ProgramFiles 'Microsoft Visual Studio\\2022\\Community\\Common7\\Tools\\VsDevCmd.bat'; cmd /c \"\"$vsDevCmd\" -arch=x64 -host_arch=x64 && cmake --preset clangd-msvc\""
+      ],
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -30,6 +68,23 @@
         "cwd": "${workspaceFolder}"
       },
       "dependsOn": ["CMake Configure (vs-debug)"],
+      "problemMatcher": []
+    },
+    {
+      "label": "CMake Build (clangd-msvc)",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "$vsDevCmd = Join-Path $env:ProgramFiles 'Microsoft Visual Studio\\2022\\Community\\Common7\\Tools\\VsDevCmd.bat'; cmd /c \"\"$vsDevCmd\" -arch=x64 -host_arch=x64 && cmake --build --preset clangd-msvc\""
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "dependsOn": ["CMake Configure (clangd-msvc)"],
       "problemMatcher": []
     },
     {
@@ -51,7 +106,7 @@
       "options": {
         "cwd": "${workspaceFolder}"
       },
-      "dependsOn": ["uv Sync (docs)", "CMake Configure (vs-debug)"],
+      "dependsOn": ["uv Sync (workspace)", "CMake Configure (vs-debug)"],
       "problemMatcher": []
     },
     {
@@ -121,7 +176,7 @@
       "options": {
         "cwd": "${workspaceFolder}"
       },
-      "dependsOn": ["uv Sync (docs)"],
+      "dependsOn": ["uv Sync (workspace)"],
       "problemMatcher": []
     }
   ]
