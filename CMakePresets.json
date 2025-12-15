@@ -1,0 +1,129 @@
+{
+  "version": 5,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 21,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "ninja-base",
+      "hidden": true,
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": {
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+      }
+    },
+    {
+      "name": "ninja-debug",
+      "displayName": "Ninja Debug",
+      "inherits": "ninja-base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CPP_QUICK_STARTER_BUILD_TESTS": "ON",
+        "CPP_QUICK_STARTER_BUILD_EXAMPLES": "ON"
+      }
+    },
+    {
+      "name": "ninja-release",
+      "displayName": "Ninja Release",
+      "inherits": "ninja-base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CPP_QUICK_STARTER_BUILD_TESTS": "OFF",
+        "CPP_QUICK_STARTER_BUILD_EXAMPLES": "ON"
+      }
+    },
+    {
+      "name": "ninja-ci",
+      "displayName": "Ninja CI",
+      "inherits": "ninja-base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CPP_QUICK_STARTER_ENABLE_WARNINGS": "ON",
+        "CPP_QUICK_STARTER_WARNINGS_AS_ERRORS": "ON",
+        "CPP_QUICK_STARTER_BUILD_TESTS": "ON",
+        "CPP_QUICK_STARTER_BUILD_EXAMPLES": "OFF",
+        "CPP_QUICK_STARTER_BUILD_BENCHMARKS": "OFF",
+        "CPP_QUICK_STARTER_BUILD_DOCS": "OFF"
+      }
+    },
+    {
+      "name": "vs-base",
+      "hidden": true,
+      "generator": "Visual Studio 17 2022",
+      "architecture": "x64",
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": {
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+      }
+    },
+    {
+      "name": "vs-debug",
+      "displayName": "VS Debug",
+      "inherits": "vs-base",
+      "cacheVariables": {
+        "CPP_QUICK_STARTER_BUILD_TESTS": "ON",
+        "CPP_QUICK_STARTER_BUILD_EXAMPLES": "ON"
+      }
+    },
+    {
+      "name": "vs-release",
+      "displayName": "VS Release",
+      "inherits": "vs-base",
+      "cacheVariables": {
+        "CPP_QUICK_STARTER_BUILD_TESTS": "OFF",
+        "CPP_QUICK_STARTER_BUILD_EXAMPLES": "ON"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "ninja-debug",
+      "configurePreset": "ninja-debug"
+    },
+    {
+      "name": "ninja-release",
+      "configurePreset": "ninja-release"
+    },
+    {
+      "name": "ninja-ci",
+      "configurePreset": "ninja-ci"
+    },
+    {
+      "name": "vs-debug",
+      "configurePreset": "vs-debug",
+      "configuration": "Debug"
+    },
+    {
+      "name": "vs-release",
+      "configurePreset": "vs-release",
+      "configuration": "Release"
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "ninja-debug",
+      "configurePreset": "ninja-debug",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "ninja-ci",
+      "configurePreset": "ninja-ci",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "vs-debug",
+      "configurePreset": "vs-debug",
+      "configuration": "Debug",
+      "output": {
+        "outputOnFailure": true
+      }
+    }
+  ]
+}

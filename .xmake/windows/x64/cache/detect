@@ -1,0 +1,75 @@
+{
+    find_program_fetch_package_xmake = {
+        ninja = false,
+        cmake = false
+    },
+    find_program_msvc_arch_x64_plat_windows_checktoolsh = {
+        ["link.exe"] = [[D:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\bin\HostX64\x64\link.exe]]
+    },
+    find_program_msvc_arch_x64_plat_windows_checktoolcc = {
+        ["cl.exe"] = [[D:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\bin\HostX64\x64\cl.exe]]
+    },
+    ["lib.detect.has_flags"] = {
+        ["windows_x64_d:\\program files\\microsoft visual studio\\2022\\community\\vc\\tools\\msvc\\14.44.35207\\bin\\hostx64\\x64\\cl.exe__cxx_cxflags_-nologo_/W4"] = true,
+        ["windows_x64_d:\\program files\\microsoft visual studio\\2022\\community\\vc\\tools\\msvc\\14.44.35207\\bin\\hostx64\\x64\\cl.exe__cxx_cxflags_-nologo_cl_sourceDependencies"] = true,
+        ["windows_x64_d:\\program files\\microsoft visual studio\\2022\\community\\vc\\tools\\msvc\\14.44.35207\\bin\\hostx64\\x64\\cl.exe__cxx_cxflags_-nologo_cl_external_includedir"] = true,
+        ["windows_x64_d:\\program files\\microsoft visual studio\\2022\\community\\vc\\tools\\msvc\\14.44.35207\\bin\\hostx64\\x64\\cl.exe__cxx_cxflags_-nologo_-MD"] = true,
+        ["windows_x64_d:\\program files\\microsoft visual studio\\2022\\community\\vc\\tools\\msvc\\14.44.35207\\bin\\hostx64\\x64\\cl.exe__cxx__-nologo_-O2"] = true,
+        ["windows_x64_d:\\program files\\microsoft visual studio\\2022\\community\\vc\\tools\\msvc\\14.44.35207\\bin\\hostx64\\x64\\cl.exe__cxx_cxflags_-nologo_-DNDEBUG"] = true,
+        ["windows_x64_d:\\program files\\microsoft visual studio\\2022\\community\\vc\\tools\\msvc\\14.44.35207\\bin\\hostx64\\x64\\cl.exe__cxx_cxflags_-nologo_-std:c++20"] = true
+    },
+    ["detect.sdks.find_vcpkgdir"] = false,
+    find_package_windows_x64_fetch_package_xmake = {
+        ["xmake::gtest_d847f60f60594398a67987de1d0eb1f5_release_v1.17.0_external"] = {
+            links = {
+                "gmock",
+                "gtest"
+            },
+            static = true,
+            sysincludedirs = {
+                [[C:\Users\Max Qian\AppData\Local\.xmake\packages\g\gtest\v1.17.0\d847f60f60594398a67987de1d0eb1f5\include]]
+            },
+            libfiles = {
+                [[C:\Users\Max Qian\AppData\Local\.xmake\packages\g\gtest\v1.17.0\d847f60f60594398a67987de1d0eb1f5\lib\gmock.lib]],
+                [[C:\Users\Max Qian\AppData\Local\.xmake\packages\g\gtest\v1.17.0\d847f60f60594398a67987de1d0eb1f5\lib\gtest.lib]],
+                [[C:\Users\Max Qian\AppData\Local\.xmake\packages\g\gtest\v1.17.0\d847f60f60594398a67987de1d0eb1f5\lib\gmock_main.lib]],
+                [[C:\Users\Max Qian\AppData\Local\.xmake\packages\g\gtest\v1.17.0\d847f60f60594398a67987de1d0eb1f5\lib\gtest_main.lib]]
+            },
+            license = "BSD-3",
+            linkdirs = {
+                [[C:\Users\Max Qian\AppData\Local\.xmake\packages\g\gtest\v1.17.0\d847f60f60594398a67987de1d0eb1f5\lib]]
+            },
+            version = "v1.17.0"
+        }
+    },
+    find_program_msvc_arch_x64_plat_windows_checktoolcxx = {
+        ["cl.exe"] = [[D:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\bin\HostX64\x64\cl.exe]]
+    },
+    find_package_windows_x64_fetch_package_system = {
+        gtest_d847f60f60594398a67987de1d0eb1f5_release_external = false
+    },
+    find_program = {
+        nim = false,
+        curl = [[C:\Windows\System32\curl.exe]],
+        gzip = [[D:\texlive\2025\bin\windows\gzip.exe]],
+        ["D:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\cl.exe"] = [[d:\program files\microsoft visual studio\2022\community\vc\tools\msvc\14.44.35207\bin\hostx64\x64\cl.exe]],
+        ["7z"] = [[C:\Program Files\7-Zip\7z.exe]],
+        ["cl.exe"] = [[D:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\bin\HostX64\x64\cl.exe]],
+        git = [[D:\Program Files\Git\cmd\git.exe]],
+        tar = [[C:\Windows\System32\tar.exe]]
+    },
+    find_programver_fetch_package_system = {
+        ["D:\\Program Files\\CMake\\bin\\cmake"] = "4.2.0-rc1",
+        ["D:\\msys64\\mingw64\\bin\\ninja.exe"] = "1.13.2"
+    },
+    find_program_msvc_arch_x64_plat_windows_checktoolld = {
+        ["link.exe"] = [[D:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\bin\HostX64\x64\link.exe]]
+    },
+    find_program_fetch_package_system = {
+        ninja = [[D:\msys64\mingw64\bin\ninja.exe]],
+        cmake = [[D:\Program Files\CMake\bin\cmake]]
+    },
+    find_program_msvc_arch_x64_plat_windows_checktoolar = {
+        ["link.exe"] = [[D:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\bin\HostX64\x64\link.exe]]
+    }
+}

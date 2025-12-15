@@ -1,0 +1,11 @@
+{
+    options = {
+        build_examples = true,
+        mode = "release",
+        build_tests = true
+    },
+    recheck = false,
+    mtimes = {
+        ["xmake.lua"] = 1765766520
+    }
+}

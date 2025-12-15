@@ -1,0 +1,30 @@
+{
+    build_tests = {
+        description = "Build unit/integration tests",
+        __scriptdir = [[D:\Project\cpp-quick-starter]],
+        default = true,
+        __sourceinfo_description = {
+            ["Build unit/integration tests"] = {
+                line = 10,
+                file = [[.\xmake.lua]]
+            }
+        },
+        showmenu = true,
+        __sourceinfo_default = { },
+        __sourceinfo_showmenu = { }
+    },
+    build_examples = {
+        description = "Build examples",
+        __scriptdir = [[D:\Project\cpp-quick-starter]],
+        default = true,
+        __sourceinfo_description = {
+            ["Build examples"] = {
+                line = 22,
+                file = [[.\xmake.lua]]
+            }
+        },
+        showmenu = true,
+        __sourceinfo_default = { },
+        __sourceinfo_showmenu = { }
+    }
+}
