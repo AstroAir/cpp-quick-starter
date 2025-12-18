@@ -4,19 +4,303 @@ name: Release
   push:
     tags:
       - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to release (e.g., v1.0.0)'
+        required: true
+        type: string
 
 permissions:
   contents: write
 
+env:
+  PROJECT_NAME: cpp_quick_starter
+
 jobs:
-  create_release:
-    name: Create GitHub Release
+  # ==========================================================================
+  # Build Multi-Platform Binaries
+  # ==========================================================================
+  build:
+    name: Build (${{ matrix.os }}, ${{ matrix.arch }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Linux x64 (GCC)
+          - os: ubuntu-latest
+            arch: x64
+            preset: ninja-release
+            artifact_name: linux-x64
+            binary_ext: ""
+          # Linux x64 (Clang)
+          - os: ubuntu-latest
+            arch: x64-clang
+            preset: linux-clang-debug
+            artifact_name: linux-x64-clang
+            binary_ext: ""
+          # macOS x64 (Intel)
+          - os: macos-13
+            arch: x64
+            preset: ninja-release
+            artifact_name: macos-x64
+            binary_ext: ""
+          # macOS ARM64 (Apple Silicon)
+          - os: macos-latest
+            arch: arm64
+            preset: ninja-release
+            artifact_name: macos-arm64
+            binary_ext: ""
+          # Windows x64 (MSVC)
+          - os: windows-latest
+            arch: x64
+            preset: vs-release
+            artifact_name: windows-x64
+            binary_ext: ".exe"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Ninja (Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y ninja-build
+
+      - name: Install Ninja (macOS)
+        if: runner.os == 'macOS'
+        run: brew install ninja
+
+      - name: Install Clang (Linux Clang build)
+        if: matrix.arch == 'x64-clang'
+        run: sudo apt-get install -y clang
+
+      - name: Configure
+        run: |
+          cmake --preset ${{ matrix.preset }} \
+            -DCPP_QUICK_STARTER_BUILD_TESTS=OFF \
+            -DCPP_QUICK_STARTER_BUILD_EXAMPLES=ON
+
+      - name: Build
+        run: cmake --build --preset ${{ matrix.preset }}
+
+      - name: Package artifacts (Unix)
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          mkdir -p dist
+          cp build/${{ env.PROJECT_NAME }}_app${{ matrix.binary_ext }} dist/
+          cp build/example_01${{ matrix.binary_ext }} dist/
+          cp README.md LICENSE dist/
+          cd dist
+          tar -czvf ../${{ env.PROJECT_NAME }}-${{ matrix.artifact_name }}.tar.gz *
+
+      - name: Package artifacts (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path dist
+          Copy-Item "build/Release/${{ env.PROJECT_NAME }}_app${{ matrix.binary_ext }}" dist/
+          Copy-Item "build/Release/example_01${{ matrix.binary_ext }}" dist/
+          Copy-Item README.md, LICENSE dist/
+          Compress-Archive -Path dist/* -DestinationPath "${{ env.PROJECT_NAME }}-${{ matrix.artifact_name }}.zip"
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.PROJECT_NAME }}-${{ matrix.artifact_name }}
+          path: |
+            ${{ env.PROJECT_NAME }}-${{ matrix.artifact_name }}.tar.gz
+            ${{ env.PROJECT_NAME }}-${{ matrix.artifact_name }}.zip
+          if-no-files-found: ignore
+
+  # ==========================================================================
+  # Build with xmake (Multi-Platform)
+  # ==========================================================================
+  build-xmake:
+    name: xmake Build (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            artifact_name: linux-x64-xmake
+          - os: macos-latest
+            artifact_name: macos-arm64-xmake
+          - os: windows-latest
+            artifact_name: windows-x64-xmake
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup xmake
+        uses: xmake-io/github-action-setup-xmake@v1
+        with:
+          xmake-version: latest
+
+      - name: Configure and Build
+        run: |
+          xmake f -m release --build_tests=n --build_examples=y -y
+          xmake -y
+
+      - name: Package (Unix)
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          mkdir -p dist
+          xmake install -o dist
+          cp README.md LICENSE dist/
+          cd dist
+          tar -czvf ../${{ env.PROJECT_NAME }}-${{ matrix.artifact_name }}.tar.gz *
+
+      - name: Package (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path dist
+          xmake install -o dist
+          Copy-Item README.md, LICENSE dist/
+          Compress-Archive -Path dist/* -DestinationPath "${{ env.PROJECT_NAME }}-${{ matrix.artifact_name }}.zip"
+
+      - name: Upload xmake artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.PROJECT_NAME }}-${{ matrix.artifact_name }}
+          path: |
+            ${{ env.PROJECT_NAME }}-${{ matrix.artifact_name }}.tar.gz
+            ${{ env.PROJECT_NAME }}-${{ matrix.artifact_name }}.zip
+          if-no-files-found: ignore
+
+  # ==========================================================================
+  # Build Documentation
+  # ==========================================================================
+  docs:
+    name: Build Documentation
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Create release
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v3
+
+      - name: Install docs dependencies
+        run: uv sync --group docs
+
+      - name: Build MkDocs
+        run: uv run mkdocs build -f mkdocs.yml -d build/mkdocs
+
+      - name: Package documentation
+        run: |
+          cd build
+          tar -czvf ../docs-site.tar.gz mkdocs
+
+      - name: Upload docs artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: docs-site
+          path: docs-site.tar.gz
+
+  # ==========================================================================
+  # Create GitHub Release
+  # ==========================================================================
+  release:
+    name: Create Release
+    needs: [build, build-xmake, docs]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Prepare release assets
+        run: |
+          mkdir -p release-assets
+          find artifacts -type f \( -name "*.tar.gz" -o -name "*.zip" \) -exec cp {} release-assets/ \;
+          ls -la release-assets/
+
+      - name: Get tag name
+        id: tag
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "tag=${{ inputs.tag }}" >> $GITHUB_OUTPUT
+          else
+            echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          echo "## What's Changed" > RELEASE_NOTES.md
+          echo "" >> RELEASE_NOTES.md
+          echo "### Build Artifacts" >> RELEASE_NOTES.md
+          echo "" >> RELEASE_NOTES.md
+          echo "| Platform | Architecture | Build System | File |" >> RELEASE_NOTES.md
+          echo "|----------|--------------|--------------|------|" >> RELEASE_NOTES.md
+          echo "| Linux | x64 | CMake (GCC) | \`${{ env.PROJECT_NAME }}-linux-x64.tar.gz\` |" >> RELEASE_NOTES.md
+          echo "| Linux | x64 | CMake (Clang) | \`${{ env.PROJECT_NAME }}-linux-x64-clang.tar.gz\` |" >> RELEASE_NOTES.md
+          echo "| Linux | x64 | xmake | \`${{ env.PROJECT_NAME }}-linux-x64-xmake.tar.gz\` |" >> RELEASE_NOTES.md
+          echo "| macOS | x64 (Intel) | CMake | \`${{ env.PROJECT_NAME }}-macos-x64.tar.gz\` |" >> RELEASE_NOTES.md
+          echo "| macOS | ARM64 (Apple Silicon) | CMake | \`${{ env.PROJECT_NAME }}-macos-arm64.tar.gz\` |" >> RELEASE_NOTES.md
+          echo "| macOS | ARM64 | xmake | \`${{ env.PROJECT_NAME }}-macos-arm64-xmake.tar.gz\` |" >> RELEASE_NOTES.md
+          echo "| Windows | x64 | CMake (MSVC) | \`${{ env.PROJECT_NAME }}-windows-x64.zip\` |" >> RELEASE_NOTES.md
+          echo "| Windows | x64 | xmake | \`${{ env.PROJECT_NAME }}-windows-x64-xmake.zip\` |" >> RELEASE_NOTES.md
+          echo "" >> RELEASE_NOTES.md
+          echo "### Documentation" >> RELEASE_NOTES.md
+          echo "" >> RELEASE_NOTES.md
+          echo "- \`docs-site.tar.gz\` - MkDocs documentation site" >> RELEASE_NOTES.md
+
+      - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ steps.tag.outputs.tag }}
+          name: Release ${{ steps.tag.outputs.tag }}
+          body_path: RELEASE_NOTES.md
           generate_release_notes: true
+          files: release-assets/*
+          draft: false
+          prerelease: ${{ contains(steps.tag.outputs.tag, '-') }}
+
+  # ==========================================================================
+  # Deploy Documentation to GitHub Pages
+  # ==========================================================================
+  deploy-docs:
+    name: Deploy Docs to GitHub Pages
+    needs: [release]
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v3
+
+      - name: Install docs dependencies
+        run: uv sync --group docs
+
+      - name: Build MkDocs
+        run: uv run mkdocs build -f mkdocs.yml -d build/mkdocs
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: build/mkdocs
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

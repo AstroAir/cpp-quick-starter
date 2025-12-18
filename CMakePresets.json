@@ -1,5 +1,5 @@
 {
-  "version": 5,
+  "version": 10,
   "cmakeMinimumRequired": {
     "major": 3,
     "minor": 21,
@@ -7,21 +7,33 @@
   },
   "configurePresets": [
     {
-      "name": "ninja-base",
+      "name": "base",
       "hidden": true,
-      "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build",
       "cacheVariables": {
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
       }
     },
     {
+      "name": "ninja-base",
+      "hidden": true,
+      "inherits": "base",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build"
+    },
+    {
+      "name": "ninja-multi-base",
+      "hidden": true,
+      "inherits": "base",
+      "generator": "Ninja Multi-Config",
+      "binaryDir": "${sourceDir}/build"
+    },
+    {
       "name": "clangd-msvc-base",
       "hidden": true,
+      "inherits": "base",
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/build/clangd-msvc",
       "cacheVariables": {
-        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
         "CMAKE_C_COMPILER": "cl",
         "CMAKE_CXX_COMPILER": "cl"
       }
@@ -47,6 +59,16 @@
       }
     },
     {
+      "name": "ninja-relwithdebinfo",
+      "displayName": "Ninja RelWithDebInfo",
+      "inherits": "ninja-base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+        "CPP_QUICK_STARTER_BUILD_TESTS": "ON",
+        "CPP_QUICK_STARTER_BUILD_EXAMPLES": "ON"
+      }
+    },
+    {
       "name": "ninja-ci",
       "displayName": "Ninja CI",
       "inherits": "ninja-base",
@@ -61,15 +83,37 @@
       }
     },
     {
+      "name": "ninja-sanitize",
+      "displayName": "Ninja with Sanitizers",
+      "inherits": "ninja-base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CPP_QUICK_STARTER_ENABLE_SANITIZERS": "ON",
+        "CPP_QUICK_STARTER_BUILD_TESTS": "ON",
+        "CPP_QUICK_STARTER_BUILD_EXAMPLES": "OFF"
+      }
+    },
+    {
+      "name": "ninja-multi",
+      "displayName": "Ninja Multi-Config",
+      "inherits": "ninja-multi-base",
+      "cacheVariables": {
+        "CPP_QUICK_STARTER_BUILD_TESTS": "ON",
+        "CPP_QUICK_STARTER_BUILD_EXAMPLES": "ON"
+      }
+    },
+    {
       "name": "msys2-mingw64-base",
       "hidden": true,
+      "inherits": "base",
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/build/msys2-mingw64",
-      "environment": {
-        "PATH": "${env:MSYS2_ROOT}/mingw64/bin;${penv:PATH}"
+      "condition": {
+        "type": "notEquals",
+        "lhs": "$env{MSYS2_ROOT}",
+        "rhs": ""
       },
       "cacheVariables": {
-        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
         "CMAKE_C_COMPILER": "gcc",
         "CMAKE_CXX_COMPILER": "g++"
       }
@@ -85,14 +129,22 @@
       }
     },
     {
+      "name": "msys2-mingw64-release",
+      "displayName": "MSYS2 MinGW64 Release",
+      "inherits": "msys2-mingw64-base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CPP_QUICK_STARTER_BUILD_TESTS": "OFF",
+        "CPP_QUICK_STARTER_BUILD_EXAMPLES": "ON"
+      }
+    },
+    {
       "name": "vs-base",
       "hidden": true,
+      "inherits": "base",
       "generator": "Visual Studio 17 2022",
       "architecture": "x64",
-      "binaryDir": "${sourceDir}/build",
-      "cacheVariables": {
-        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
-      }
+      "binaryDir": "${sourceDir}/build"
     },
     {
       "name": "vs-debug",
@@ -100,6 +152,15 @@
       "inherits": "vs-base",
       "cacheVariables": {
         "CPP_QUICK_STARTER_BUILD_TESTS": "ON",
+        "CPP_QUICK_STARTER_BUILD_EXAMPLES": "ON"
+      }
+    },
+    {
+      "name": "vs-release",
+      "displayName": "VS Release",
+      "inherits": "vs-base",
+      "cacheVariables": {
+        "CPP_QUICK_STARTER_BUILD_TESTS": "OFF",
         "CPP_QUICK_STARTER_BUILD_EXAMPLES": "ON"
       }
     },
@@ -114,10 +175,108 @@
       }
     },
     {
-      "name": "vs-release",
-      "displayName": "VS Release",
-      "inherits": "vs-base",
+      "name": "macos-base",
+      "hidden": true,
+      "inherits": "ninja-base",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Darwin"
+      }
+    },
+    {
+      "name": "macos-debug",
+      "displayName": "macOS Debug",
+      "inherits": "macos-base",
       "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CPP_QUICK_STARTER_BUILD_TESTS": "ON",
+        "CPP_QUICK_STARTER_BUILD_EXAMPLES": "ON"
+      }
+    },
+    {
+      "name": "macos-release",
+      "displayName": "macOS Release",
+      "inherits": "macos-base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CPP_QUICK_STARTER_BUILD_TESTS": "OFF",
+        "CPP_QUICK_STARTER_BUILD_EXAMPLES": "ON"
+      }
+    },
+    {
+      "name": "linux-base",
+      "hidden": true,
+      "inherits": "ninja-base",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      }
+    },
+    {
+      "name": "linux-debug",
+      "displayName": "Linux Debug",
+      "inherits": "linux-base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CPP_QUICK_STARTER_BUILD_TESTS": "ON",
+        "CPP_QUICK_STARTER_BUILD_EXAMPLES": "ON"
+      }
+    },
+    {
+      "name": "linux-release",
+      "displayName": "Linux Release",
+      "inherits": "linux-base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CPP_QUICK_STARTER_BUILD_TESTS": "OFF",
+        "CPP_QUICK_STARTER_BUILD_EXAMPLES": "ON"
+      }
+    },
+    {
+      "name": "linux-clang-base",
+      "hidden": true,
+      "inherits": "linux-base",
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "clang",
+        "CMAKE_CXX_COMPILER": "clang++"
+      }
+    },
+    {
+      "name": "linux-clang-debug",
+      "displayName": "Linux Clang Debug",
+      "inherits": "linux-clang-base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CPP_QUICK_STARTER_BUILD_TESTS": "ON",
+        "CPP_QUICK_STARTER_BUILD_EXAMPLES": "ON"
+      }
+    },
+    {
+      "name": "vcpkg-base",
+      "hidden": true,
+      "inherits": "ninja-base",
+      "cacheVariables": {
+        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+      }
+    },
+    {
+      "name": "vcpkg-debug",
+      "displayName": "vcpkg Debug",
+      "inherits": "vcpkg-base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CPP_QUICK_STARTER_BUILD_TESTS": "ON",
+        "CPP_QUICK_STARTER_BUILD_EXAMPLES": "ON"
+      }
+    },
+    {
+      "name": "vcpkg-release",
+      "displayName": "vcpkg Release",
+      "inherits": "vcpkg-base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
         "CPP_QUICK_STARTER_BUILD_TESTS": "OFF",
         "CPP_QUICK_STARTER_BUILD_EXAMPLES": "ON"
       }
@@ -129,6 +288,32 @@
       "configurePreset": "ninja-debug"
     },
     {
+      "name": "ninja-release",
+      "configurePreset": "ninja-release"
+    },
+    {
+      "name": "ninja-relwithdebinfo",
+      "configurePreset": "ninja-relwithdebinfo"
+    },
+    {
+      "name": "ninja-ci",
+      "configurePreset": "ninja-ci"
+    },
+    {
+      "name": "ninja-sanitize",
+      "configurePreset": "ninja-sanitize"
+    },
+    {
+      "name": "ninja-multi-debug",
+      "configurePreset": "ninja-multi",
+      "configuration": "Debug"
+    },
+    {
+      "name": "ninja-multi-release",
+      "configurePreset": "ninja-multi",
+      "configuration": "Release"
+    },
+    {
       "name": "clangd-msvc",
       "configurePreset": "clangd-msvc"
     },
@@ -137,12 +322,8 @@
       "configurePreset": "msys2-mingw64-debug"
     },
     {
-      "name": "ninja-release",
-      "configurePreset": "ninja-release"
-    },
-    {
-      "name": "ninja-ci",
-      "configurePreset": "ninja-ci"
+      "name": "msys2-mingw64-release",
+      "configurePreset": "msys2-mingw64-release"
     },
     {
       "name": "vs-debug",
@@ -153,37 +334,127 @@
       "name": "vs-release",
       "configurePreset": "vs-release",
       "configuration": "Release"
+    },
+    {
+      "name": "macos-debug",
+      "configurePreset": "macos-debug"
+    },
+    {
+      "name": "macos-release",
+      "configurePreset": "macos-release"
+    },
+    {
+      "name": "linux-debug",
+      "configurePreset": "linux-debug"
+    },
+    {
+      "name": "linux-release",
+      "configurePreset": "linux-release"
+    },
+    {
+      "name": "linux-clang-debug",
+      "configurePreset": "linux-clang-debug"
+    },
+    {
+      "name": "vcpkg-debug",
+      "configurePreset": "vcpkg-debug"
+    },
+    {
+      "name": "vcpkg-release",
+      "configurePreset": "vcpkg-release"
     }
   ],
   "testPresets": [
     {
-      "name": "ninja-debug",
-      "configurePreset": "ninja-debug",
+      "name": "default",
+      "hidden": true,
       "output": {
         "outputOnFailure": true
       }
     },
     {
-      "name": "msys2-mingw64-debug",
-      "configurePreset": "msys2-mingw64-debug",
-      "output": {
-        "outputOnFailure": true
-      }
+      "name": "ninja-debug",
+      "configurePreset": "ninja-debug",
+      "inherits": "default"
+    },
+    {
+      "name": "ninja-release",
+      "configurePreset": "ninja-release",
+      "inherits": "default"
     },
     {
       "name": "ninja-ci",
       "configurePreset": "ninja-ci",
-      "output": {
-        "outputOnFailure": true
-      }
+      "inherits": "default"
+    },
+    {
+      "name": "ninja-sanitize",
+      "configurePreset": "ninja-sanitize",
+      "inherits": "default"
+    },
+    {
+      "name": "clangd-msvc",
+      "configurePreset": "clangd-msvc",
+      "inherits": "default"
+    },
+    {
+      "name": "msys2-mingw64-debug",
+      "configurePreset": "msys2-mingw64-debug",
+      "inherits": "default"
     },
     {
       "name": "vs-debug",
       "configurePreset": "vs-debug",
       "configuration": "Debug",
-      "output": {
-        "outputOnFailure": true
-      }
+      "inherits": "default"
+    },
+    {
+      "name": "macos-debug",
+      "configurePreset": "macos-debug",
+      "inherits": "default"
+    },
+    {
+      "name": "linux-debug",
+      "configurePreset": "linux-debug",
+      "inherits": "default"
+    },
+    {
+      "name": "linux-clang-debug",
+      "configurePreset": "linux-clang-debug",
+      "inherits": "default"
+    },
+    {
+      "name": "vcpkg-debug",
+      "configurePreset": "vcpkg-debug",
+      "inherits": "default"
+    }
+  ],
+  "workflowPresets": [
+    {
+      "name": "dev",
+      "description": "Development workflow: configure, build, test",
+      "steps": [
+        { "type": "configure", "name": "ninja-debug" },
+        { "type": "build", "name": "ninja-debug" },
+        { "type": "test", "name": "ninja-debug" }
+      ]
+    },
+    {
+      "name": "ci",
+      "description": "CI workflow: configure, build, test with warnings as errors",
+      "steps": [
+        { "type": "configure", "name": "ninja-ci" },
+        { "type": "build", "name": "ninja-ci" },
+        { "type": "test", "name": "ninja-ci" }
+      ]
+    },
+    {
+      "name": "release",
+      "description": "Release workflow: configure and build release",
+      "steps": [
+        { "type": "configure", "name": "ninja-release" },
+        { "type": "build", "name": "ninja-release" }
+      ]
     }
   ]
 }

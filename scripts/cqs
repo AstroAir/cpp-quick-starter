@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# cpp-quick-starter CLI wrapper for Unix
+# Usage: ./cqs init, ./cqs add module, etc.
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+python3 "$SCRIPT_DIR/cqs.py" "$@"

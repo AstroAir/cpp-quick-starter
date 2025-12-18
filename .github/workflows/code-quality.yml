@@ -5,10 +5,18 @@ name: Code Quality
     branches:
       - main
   pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  pre_commit:
-    name: pre-commit
+  # ==========================================================================
+  # Pre-commit Hooks
+  # ==========================================================================
+  pre-commit:
+    name: Pre-commit
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -17,7 +25,7 @@ jobs:
       - name: Setup uv
         uses: astral-sh/setup-uv@v3
 
-      - name: Install dev deps
+      - name: Install dev dependencies
         run: uv sync --group dev
 
       - name: Install system tools
@@ -25,11 +33,14 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y clang-format clang-tidy ninja-build
 
-      - name: Run pre-commit
+      - name: Run pre-commit on all files
         run: uv run pre-commit run --all-files
 
-  clang_format:
-    name: clang-format
+  # ==========================================================================
+  # Clang-Format Check
+  # ==========================================================================
+  clang-format:
+    name: Clang-Format
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -40,28 +51,189 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y clang-format
 
-      - name: Check formatting
+      - name: Check C++ formatting
         shell: bash
         run: |
-          files=$(git ls-files "*.cpp" "*.hpp")
-          clang-format --dry-run --Werror $files
+          echo "Checking formatting for C++ files..."
+          files=$(find src include tests benchmarks examples -name "*.cpp" -o -name "*.hpp" 2>/dev/null || true)
+          if [[ -n "$files" ]]; then
+            echo "$files" | xargs clang-format --dry-run --Werror
+            echo "✅ All files are properly formatted"
+          else
+            echo "No C++ files found to check"
+          fi
 
-  clang_tidy:
-    name: clang-tidy
+  # ==========================================================================
+  # Clang-Tidy Static Analysis
+  # ==========================================================================
+  clang-tidy:
+    name: Clang-Tidy
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install clang-tidy and ninja
+      - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y clang-tidy ninja-build
+          sudo apt-get install -y clang clang-tidy ninja-build
 
-      - name: Configure (Ninja Debug)
+      - name: Configure (generate compile_commands.json)
         run: cmake --preset ninja-debug
 
       - name: Run clang-tidy
         shell: bash
         run: |
-          clang-tidy -p build/ninja-debug src/main.cpp src/core/greeting.cpp src/utils/string_utils.cpp
+          echo "Running clang-tidy analysis..."
+          find src -name "*.cpp" | xargs clang-tidy -p build --warnings-as-errors='*'
+
+  # ==========================================================================
+  # Cppcheck Static Analysis
+  # ==========================================================================
+  cppcheck:
+    name: Cppcheck
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install cppcheck
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cppcheck
+
+      - name: Run cppcheck
+        run: |
+          cppcheck --enable=warning,style,performance,portability \
+            --error-exitcode=1 \
+            --suppress=missingIncludeSystem \
+            --inline-suppr \
+            -I include \
+            src/ tests/ examples/
+
+  # ==========================================================================
+  # Include-What-You-Use (IWYU)
+  # ==========================================================================
+  iwyu:
+    name: Include-What-You-Use
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y iwyu ninja-build
+
+      - name: Configure
+        run: cmake --preset ninja-debug
+
+      - name: Run IWYU
+        run: |
+          iwyu_tool.py -p build -- -Xiwyu --no_fwd_decls || true
+          echo "IWYU analysis complete (informational only)"
+
+  # ==========================================================================
+  # EditorConfig Check
+  # ==========================================================================
+  editorconfig:
+    name: EditorConfig
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install editorconfig-checker
+        run: |
+          curl -sSL https://github.com/editorconfig-checker/editorconfig-checker/releases/download/2.8.0/ec-linux-amd64.tar.gz | tar xz
+          sudo mv bin/ec-linux-amd64 /usr/local/bin/ec
+
+      - name: Check EditorConfig compliance
+        run: ec --exclude "build|\.git|\.venv|uv\.lock"
+
+  # ==========================================================================
+  # Markdown Lint
+  # ==========================================================================
+  markdown:
+    name: Markdown Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Lint Markdown files
+        uses: DavidAnson/markdownlint-cli2-action@v19
+        with:
+          globs: |
+            **/*.md
+            !build/**
+            !.venv/**
+
+  # ==========================================================================
+  # YAML Lint
+  # ==========================================================================
+  yaml:
+    name: YAML Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Lint YAML files
+        uses: ibiqlik/action-yamllint@v3
+        with:
+          file_or_dir: .
+          config_data: |
+            extends: default
+            rules:
+              line-length:
+                max: 120
+              truthy:
+                check-keys: false
+
+  # ==========================================================================
+  # CMake Lint
+  # ==========================================================================
+  cmake-lint:
+    name: CMake Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install cmake-lint
+        run: pip install cmakelint
+
+      - name: Lint CMakeLists.txt
+        run: |
+          find . -name "CMakeLists.txt" -not -path "./build/*" | xargs cmakelint --filter=-linelength || true
+
+  # ==========================================================================
+  # Security Scan (CodeQL)
+  # ==========================================================================
+  codeql:
+    name: CodeQL Security Scan
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: cpp
+
+      - name: Install Ninja
+        run: sudo apt-get update && sudo apt-get install -y ninja-build
+
+      - name: Build for CodeQL
+        run: |
+          cmake --preset ninja-ci
+          cmake --build --preset ninja-ci
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3

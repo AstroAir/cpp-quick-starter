@@ -141,3 +141,8 @@ endif()
 if(TARGET mkdocs-build)
   add_dependencies(docs mkdocs-build)
 endif()
+
+# === Script Integration ===
+# Add convenience targets for development tasks
+include(Scripts)
+add_script_targets()

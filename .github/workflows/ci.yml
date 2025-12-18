@@ -5,24 +5,47 @@ name: CI
     branches:
       - main
   pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CMAKE_VERSION: '3.21'
 
 jobs:
+  # ==========================================================================
+  # CMake Multi-Platform Build
+  # ==========================================================================
   cmake:
-    name: CMake (${{ matrix.os }})
+    name: CMake (${{ matrix.os }}, ${{ matrix.compiler }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         include:
+          # Linux GCC
           - os: ubuntu-latest
+            compiler: gcc
             configure_preset: ninja-ci
             build_preset: ninja-ci
             test_preset: ninja-ci
+          # Linux Clang
+          - os: ubuntu-latest
+            compiler: clang
+            configure_preset: linux-clang-debug
+            build_preset: linux-clang-debug
+            test_preset: linux-clang-debug
+          # macOS (Apple Clang)
           - os: macos-latest
+            compiler: appleclang
             configure_preset: ninja-ci
             build_preset: ninja-ci
             test_preset: ninja-ci
+          # Windows MSVC
           - os: windows-latest
+            compiler: msvc
             configure_preset: vs-debug
             build_preset: vs-debug
             test_preset: vs-debug
@@ -30,6 +53,18 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Install Ninja (Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y ninja-build
+
+      - name: Install Ninja (macOS)
+        if: runner.os == 'macOS'
+        run: brew install ninja
+
+      - name: Install Clang (Linux)
+        if: matrix.compiler == 'clang'
+        run: sudo apt-get install -y clang
 
       - name: Configure
         run: cmake --preset ${{ matrix.configure_preset }}
@@ -40,8 +75,69 @@ jobs:
       - name: Test
         run: ctest --preset ${{ matrix.test_preset }}
 
+      - name: Upload test results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ matrix.os }}-${{ matrix.compiler }}
+          path: build/**/Testing/
+
+  # ==========================================================================
+  # CMake with Sanitizers (Linux only)
+  # ==========================================================================
+  sanitizers:
+    name: Sanitizers (${{ matrix.sanitizer }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        sanitizer: [address, undefined]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y ninja-build
+
+      - name: Configure with Sanitizers
+        run: |
+          cmake --preset ninja-sanitize \
+            -DCPP_QUICK_STARTER_SANITIZER_TYPE=${{ matrix.sanitizer }}
+
+      - name: Build
+        run: cmake --build --preset ninja-sanitize
+
+      - name: Test
+        run: ctest --preset ninja-sanitize
+
+  # ==========================================================================
+  # Benchmarks Build (verify compilation)
+  # ==========================================================================
+  benchmarks:
+    name: Benchmarks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y ninja-build
+
+      - name: Configure with Benchmarks
+        run: |
+          cmake -B build -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCPP_QUICK_STARTER_BUILD_BENCHMARKS=ON \
+            -DCPP_QUICK_STARTER_BUILD_TESTS=OFF
+
+      - name: Build Benchmarks
+        run: cmake --build build
+
+  # ==========================================================================
+  # Documentation Build
+  # ==========================================================================
   docs:
-    name: Docs (mkdocs)
+    name: Documentation
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -50,13 +146,16 @@ jobs:
       - name: Setup uv
         uses: astral-sh/setup-uv@v3
 
-      - name: Install docs deps
+      - name: Install docs dependencies
         run: uv sync --group docs
 
-      - name: Build docs (mkdocs)
+      - name: Build MkDocs
         run: uv run mkdocs build -f mkdocs.yml -d build/mkdocs
 
-      - name: Configure (CMake Ninja CI)
+      - name: Install Ninja
+        run: sudo apt-get update && sudo apt-get install -y ninja-build
+
+      - name: Configure CMake
         run: cmake --preset ninja-ci
 
       - name: Build docs (CMake target)
@@ -67,9 +166,44 @@ jobs:
         with:
           name: mkdocs-site
           path: build/mkdocs
+          retention-days: 7
 
+  # ==========================================================================
+  # xmake Multi-Platform Build
+  # ==========================================================================
   xmake:
-    name: xmake (ubuntu-latest)
+    name: xmake (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup xmake
+        uses: xmake-io/github-action-setup-xmake@v1
+        with:
+          xmake-version: latest
+
+      - name: Configure
+        run: xmake f -m release --build_tests=y --build_examples=y -y
+
+      - name: Build
+        run: xmake -y
+
+      - name: Run unit tests
+        run: xmake run unit_tests
+
+      - name: Run integration tests
+        run: xmake run integration_tests
+
+  # ==========================================================================
+  # xmake Documentation Task
+  # ==========================================================================
+  xmake-docs:
+    name: xmake docs
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -78,7 +212,7 @@ jobs:
       - name: Setup uv
         uses: astral-sh/setup-uv@v3
 
-      - name: Install docs deps
+      - name: Install docs dependencies
         run: uv sync --group docs
 
       - name: Setup xmake
@@ -86,17 +220,51 @@ jobs:
         with:
           xmake-version: latest
 
-      - name: Configure
-        run: xmake f -m release --build_tests=y --build_examples=y
-
-      - name: Build
-        run: xmake
-
-      - name: Run unit tests
-        run: xmake run unit_tests
-
-      - name: Run integration tests
-        run: xmake run integration_tests
-
       - name: Build docs (xmake task)
         run: xmake docs -o build/mkdocs-xmake
+
+  # ==========================================================================
+  # Examples Build
+  # ==========================================================================
+  examples:
+    name: Examples (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        include:
+          - os: ubuntu-latest
+            preset: ninja-release
+          - os: macos-latest
+            preset: ninja-release
+          - os: windows-latest
+            preset: vs-release
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Ninja (Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y ninja-build
+
+      - name: Install Ninja (macOS)
+        if: runner.os == 'macOS'
+        run: brew install ninja
+
+      - name: Configure
+        run: |
+          cmake --preset ${{ matrix.preset }} \
+            -DCPP_QUICK_STARTER_BUILD_EXAMPLES=ON
+
+      - name: Build
+        run: cmake --build --preset ${{ matrix.preset }}
+
+      - name: Run example
+        shell: bash
+        run: |
+          if [[ "${{ runner.os }}" == "Windows" ]]; then
+            ./build/Release/example_01.exe || ./build/Debug/example_01.exe
+          else
+            ./build/example_01
+          fi
