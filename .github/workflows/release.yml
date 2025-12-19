@@ -106,7 +106,7 @@ jobs:
           Compress-Archive -Path dist/* -DestinationPath "${{ env.PROJECT_NAME }}-${{ matrix.artifact_name }}.zip"
 
       - name: Upload build artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: ${{ env.PROJECT_NAME }}-${{ matrix.artifact_name }}
           path: |
@@ -165,7 +165,7 @@ jobs:
           Compress-Archive -Path dist/* -DestinationPath "${{ env.PROJECT_NAME }}-${{ matrix.artifact_name }}.zip"
 
       - name: Upload xmake artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: ${{ env.PROJECT_NAME }}-${{ matrix.artifact_name }}
           path: |
@@ -198,7 +198,7 @@ jobs:
           tar -czvf ../docs-site.tar.gz mkdocs
 
       - name: Upload docs artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: docs-site
           path: docs-site.tar.gz
