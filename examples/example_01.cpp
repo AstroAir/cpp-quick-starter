@@ -3,15 +3,13 @@
 
 #include <iostream>
 
-int main()
-{
-  std::cout << project_name::core::greeting("example") << '\n';
+int main() {
+    std::cout << project_name::core::greeting("example") << '\n';
 
-  const auto tokens = project_name::utils::split("a,b,c", ',');
-  for (const auto &t : tokens)
-  {
-    std::cout << project_name::utils::trim(t) << '\n';
-  }
+    const auto tokens = project_name::utils::split("a,b,c", ',');
+    for (const auto &t : tokens) {
+        std::cout << project_name::utils::trim(t) << '\n';
+    }
 
-  return 0;
+    return 0;
 }

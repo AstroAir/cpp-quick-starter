@@ -292,15 +292,15 @@ Cross-platform scripts for common development tasks:
 <!-- [EN] -->
 - Read the [Scaffolding Guide](scaffolding.md) for CLI tool details
 - Read the [API Documentation](api/index.md)
-- Check out [Examples](../examples/)
-- See [Contributing Guidelines](../CONTRIBUTING.md)
+- Check out [Examples](https://github.com/AstroAir/cpp-quick-starter/tree/master/examples)
+- See [Contributing Guidelines](https://github.com/AstroAir/cpp-quick-starter/blob/master/CONTRIBUTING.md)
 - Learn about [Code Quality](guides/code-quality.md) tools
 <!-- [/EN] -->
 
 <!-- [ZH] -->
 - 阅读 [脚手架指南](scaffolding.md) 了解 CLI 工具详情
 - 阅读 [API 文档](api/index.md)
-- 查看 [示例代码](../examples/)
-- 参阅 [贡献指南](../CONTRIBUTING.md)
+- 查看 [示例代码](https://github.com/AstroAir/cpp-quick-starter/tree/master/examples)
+- 参阅 [贡献指南](https://github.com/AstroAir/cpp-quick-starter/blob/master/CONTRIBUTING.md)
 - 了解 [代码质量](guides/code-quality.md) 工具
 <!-- [/ZH] -->

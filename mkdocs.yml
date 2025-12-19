@@ -11,6 +11,7 @@ nav:
   - Getting Started: getting-started.md
   - Scaffolding: scaffolding.md
   - Guides:
+      - Quick Start: guides/getting-started.md
       - CMake: guides/cmake.md
       - XMake: guides/xmake.md
       - Testing: guides/testing.md

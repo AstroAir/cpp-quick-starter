@@ -809,7 +809,7 @@ def add_conan_dependency(root: Path, package: str, version: str = "") -> None:
 def cmd_strip_language(root: Optional[Path] = None, lang: str = "zh") -> bool:
     """
     Strip a language from bilingual documentation files.
-    
+
     Args:
         root: Project root directory
         lang: Language to remove ('en' or 'zh')
@@ -832,7 +832,7 @@ def cmd_strip_language(root: Optional[Path] = None, lang: str = "zh") -> bool:
 
     # Find all markdown files
     md_files = list(docs_dir.rglob("*.md"))
-    
+
     if not md_files:
         print_error("No markdown files found in docs/")
         return False
@@ -847,7 +847,7 @@ def cmd_strip_language(root: Optional[Path] = None, lang: str = "zh") -> bool:
         return False
 
     print()
-    
+
     # Process files
     processed = 0
     with Spinner(f"Stripping {lang_name} content...") as spinner:
@@ -858,14 +858,14 @@ def cmd_strip_language(root: Optional[Path] = None, lang: str = "zh") -> bool:
 
     print()
     print_success(f"Removed {lang_name} content from documentation.")
-    
+
     return True
 
 
 def strip_language_from_file(file_path: Path, lang: str) -> bool:
     """
     Remove language-specific content from a markdown file.
-    
+
     Removes content between <!-- [EN] --> and <!-- [/EN] --> markers (for lang='en')
     or <!-- [ZH] --> and <!-- [/ZH] --> markers (for lang='zh').
     Also cleans up bilingual headers like "Title / 标题" to single language.
@@ -908,14 +908,14 @@ def strip_language_from_file(file_path: Path, lang: str) -> bool:
 
         # Clean up multiple blank lines
         content = re.sub(r'\n{3,}', '\n\n', content)
-        
+
         if content != original:
             file_path.write_text(content, encoding="utf-8")
             return True
-            
+
     except (UnicodeDecodeError, PermissionError) as e:
         pass
-    
+
     return False
 
 
