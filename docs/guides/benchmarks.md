@@ -10,7 +10,7 @@ This project uses Google Benchmark framework for performance benchmarking.
 
 ## Benchmark Structure / 基准测试结构
 
-```
+```text
 benchmarks/
 ├── CMakeLists.txt           # CMake configuration / CMake 配置
 └── string_utils_bench.cpp   # string_utils benchmarks / string_utils 基准测试

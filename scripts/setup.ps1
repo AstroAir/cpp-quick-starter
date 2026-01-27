@@ -71,8 +71,8 @@ Write-Host "Required Tools:" -ForegroundColor Yellow
 $allRequired = $true
 $allRequired = (Test-Tool -Name "CMake" -Command "cmake" -Required) -and $allRequired
 $allRequired = (Test-Tool -Name "C++ Compiler" -Command "cl" -VersionArg "" -Required:$false) -or `
-               (Test-Tool -Name "C++ Compiler" -Command "g++" -Required:$false) -or `
-               (Test-Tool -Name "C++ Compiler" -Command "clang++" -Required:$false)
+              (Test-Tool -Name "C++ Compiler" -Command "g++" -Required:$false) -or `
+              (Test-Tool -Name "C++ Compiler" -Command "clang++" -Required:$false)
 
 if (-not $allRequired) {
     Write-Host "`n  A C++ compiler is required (MSVC cl, g++, or clang++)" -ForegroundColor Red

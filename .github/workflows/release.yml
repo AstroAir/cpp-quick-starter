@@ -1,3 +1,4 @@
+---
 name: Release
 
 'on':
@@ -244,10 +245,12 @@ jobs:
           echo "| Platform | Architecture | Build System | File |" >> RELEASE_NOTES.md
           echo "|----------|--------------|--------------|------|" >> RELEASE_NOTES.md
           echo "| Linux | x64 | CMake (GCC) | \`${{ env.PROJECT_NAME }}-linux-x64.tar.gz\` |" >> RELEASE_NOTES.md
-          echo "| Linux | x64 | CMake (Clang) | \`${{ env.PROJECT_NAME }}-linux-x64-clang.tar.gz\` |" >> RELEASE_NOTES.md
+          echo "| Linux | x64 | CMake (Clang) | \`${{ env.PROJECT_NAME }}-linux-x64-clang.tar.gz\` |" \
+            >> RELEASE_NOTES.md
           echo "| Linux | x64 | xmake | \`${{ env.PROJECT_NAME }}-linux-x64-xmake.tar.gz\` |" >> RELEASE_NOTES.md
           echo "| macOS | x64 (Intel) | CMake | \`${{ env.PROJECT_NAME }}-macos-x64.tar.gz\` |" >> RELEASE_NOTES.md
-          echo "| macOS | ARM64 (Apple Silicon) | CMake | \`${{ env.PROJECT_NAME }}-macos-arm64.tar.gz\` |" >> RELEASE_NOTES.md
+          echo "| macOS | ARM64 (Apple Silicon) | CMake | \`${{ env.PROJECT_NAME }}-macos-arm64.tar.gz\` |" \
+            >> RELEASE_NOTES.md
           echo "| macOS | ARM64 | xmake | \`${{ env.PROJECT_NAME }}-macos-arm64-xmake.tar.gz\` |" >> RELEASE_NOTES.md
           echo "| Windows | x64 | CMake (MSVC) | \`${{ env.PROJECT_NAME }}-windows-x64.zip\` |" >> RELEASE_NOTES.md
           echo "| Windows | x64 | xmake | \`${{ env.PROJECT_NAME }}-windows-x64-xmake.zip\` |" >> RELEASE_NOTES.md

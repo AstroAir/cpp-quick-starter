@@ -145,10 +145,10 @@ python scripts/init-project.py "My Awesome Library" \
 
 <!-- [EN] -->
 1. **Name Conversion**: Converts your project name to multiple formats:
-   - `snake_case` for C++ identifiers
-   - `kebab-case` for file names and URLs
-   - `PascalCase` for class names
-   - `UPPER_SNAKE` for macros
+    - `snake_case` for C++ identifiers
+    - `kebab-case` for file names and URLs
+    - `PascalCase` for class names
+    - `UPPER_SNAKE` for macros
 
 2. **File Updates**: Updates project references in all configuration files
 
@@ -161,10 +161,10 @@ python scripts/init-project.py "My Awesome Library" \
 
 <!-- [ZH] -->
 1. **名称转换**：将项目名称转换为多种格式：
-   - `snake_case` 用于 C++ 标识符
-   - `kebab-case` 用于文件名和 URL
-   - `PascalCase` 用于类名
-   - `UPPER_SNAKE` 用于宏
+    - `snake_case` 用于 C++ 标识符
+    - `kebab-case` 用于文件名和 URL
+    - `PascalCase` 用于类名
+    - `UPPER_SNAKE` 用于宏
 
 2. **文件更新**：更新所有配置文件中的项目引用
 

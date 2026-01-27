@@ -10,7 +10,7 @@ This project uses Google Test framework for unit and integration tests.
 
 ## Test Structure / 测试结构
 
-```
+```text
 tests/
 ├── unit/                    # Unit tests / 单元测试
 │   ├── main.cpp             # Test entry / 测试入口

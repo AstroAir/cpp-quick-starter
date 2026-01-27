@@ -126,7 +126,7 @@ xmake run unit_tests               # Run tests / 运行测试
 
 ## Project Structure / 项目结构
 
-```
+```text
 cpp-quick-starter/
 ├── include/project_name/     # Public headers / 公共头文件
 │   ├── core/                 # Core functionality / 核心功能

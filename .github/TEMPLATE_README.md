@@ -68,7 +68,7 @@ After initializing your project:
 ## Available Scripts
 
 | Script | Description |
-|--------|-------------|
+| ------ | ----------- |
 | `init-project.py` | Initialize project with new name |
 | `build.sh` / `build.ps1` | Configure and build project |
 | `test.sh` / `test.ps1` | Run tests |
@@ -78,7 +78,7 @@ After initializing your project:
 
 ## Directory Structure After Init
 
-```
+```text
 your-project/
 ├── include/your_project/     # Public headers (renamed)
 ├── src/                      # Source files

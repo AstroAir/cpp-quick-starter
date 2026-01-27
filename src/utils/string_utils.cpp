@@ -22,13 +22,13 @@ std::string trim(std::string_view input) {
 
     std::size_t begin = 0;
     while (begin < input.size() &&
-           is_space(static_cast<unsigned char>(input[begin]))) {
+          is_space(static_cast<unsigned char>(input[begin]))) {
         ++begin;
     }
 
     std::size_t end = input.size();
     while (end > begin &&
-           is_space(static_cast<unsigned char>(input[end - 1]))) {
+          is_space(static_cast<unsigned char>(input[end - 1]))) {
         --end;
     }
 

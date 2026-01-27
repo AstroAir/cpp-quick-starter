@@ -1,3 +1,4 @@
+---
 name: Code Quality
 
 'on':
@@ -147,7 +148,8 @@ jobs:
 
       - name: Install editorconfig-checker
         run: |
-          curl -sSL https://github.com/editorconfig-checker/editorconfig-checker/releases/download/2.8.0/ec-linux-amd64.tar.gz | tar xz
+          EC_URL="https://github.com/editorconfig-checker/editorconfig-checker/releases"
+          curl -sSL "${EC_URL}/download/2.8.0/ec-linux-amd64.tar.gz" | tar xz
           sudo mv bin/ec-linux-amd64 /usr/local/bin/ec
 
       - name: Check EditorConfig compliance

@@ -3,7 +3,7 @@ PROJECT_BRIEF          = "Simple C++ Project Quick Start Template"
 OUTPUT_DIRECTORY       = api/doxygen
 
 INPUT                  = ../include \
-                         ../src
+                        ../src
 RECURSIVE              = YES
 FILE_PATTERNS          = *.hpp \
                          *.cpp

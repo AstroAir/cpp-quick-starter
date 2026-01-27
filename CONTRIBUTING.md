@@ -21,22 +21,22 @@ This project adheres to the [Code of Conduct](CODE_OF_CONDUCT.md). By participat
 1. Fork the repository
 2. Clone your fork:
 
-   ```bash
-   git clone https://github.com/YOUR_USERNAME/cpp-quick-starter.git
-   cd cpp-quick-starter
-   ```
+    ```bash
+    git clone https://github.com/YOUR_USERNAME/cpp-quick-starter.git
+    cd cpp-quick-starter
+    ```
 
 3. Add the upstream remote:
 
-   ```bash
-   git remote add upstream https://github.com/AstroAir/cpp-quick-starter.git
-   ```
+    ```bash
+    git remote add upstream https://github.com/AstroAir/cpp-quick-starter.git
+    ```
 
 4. Create a branch for your changes:
 
-   ```bash
-   git checkout -b feature/your-feature-name
-   ```
+    ```bash
+    git checkout -b feature/your-feature-name
+    ```
 
 ## How to Contribute
 
@@ -188,40 +188,40 @@ test(utils): add unit tests for trim function
 
 1. **Update your branch** with the latest upstream changes:
 
-   ```bash
-   git fetch upstream
-   git rebase upstream/main
-   ```
+    ```bash
+    git fetch upstream
+    git rebase upstream/main
+    ```
 
 2. **Ensure all tests pass**:
 
-   ```bash
-   cmake --preset ninja-ci
-   cmake --build --preset ninja-ci
-   ctest --preset ninja-ci
-   ```
+    ```bash
+    cmake --preset ninja-ci
+    cmake --build --preset ninja-ci
+    ctest --preset ninja-ci
+    ```
 
 3. **Push your changes**:
 
-   ```bash
-   git push origin feature/your-feature-name
-   ```
+    ```bash
+    git push origin feature/your-feature-name
+    ```
 
 4. **Create a Pull Request**:
-   - Use a clear, descriptive title
-   - Fill out the PR template
-   - Reference related issues
-   - Request reviews from maintainers
+    - Use a clear, descriptive title
+    - Fill out the PR template
+    - Reference related issues
+    - Request reviews from maintainers
 
 5. **Address review feedback**:
-   - Make requested changes
-   - Push additional commits
-   - Re-request review when ready
+    - Make requested changes
+    - Push additional commits
+    - Re-request review when ready
 
 6. **Merge**:
-   - PRs require at least one approval
-   - CI must pass
-   - Squash and merge is preferred
+    - PRs require at least one approval
+    - CI must pass
+    - Squash and merge is preferred
 
 ## Questions?
 

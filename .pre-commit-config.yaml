@@ -1,3 +1,4 @@
+---
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
@@ -30,7 +31,10 @@ repos:
 
       - id: clang-tidy
         name: clang-tidy (ninja-debug)
-        entry: bash -lc 'cmake --preset ninja-debug && clang-tidy -p build/ninja-debug src/main.cpp src/core/greeting.cpp src/utils/string_utils.cpp'
+        entry: >-
+          bash -lc 'cmake --preset ninja-debug &&
+          clang-tidy -p build/ninja-debug
+          src/main.cpp src/core/greeting.cpp src/utils/string_utils.cpp'
         language: system
         pass_filenames: false
         stages: [manual]

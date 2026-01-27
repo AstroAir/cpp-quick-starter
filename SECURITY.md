@@ -14,8 +14,8 @@ We take security vulnerabilities seriously. If you discover a security issue, pl
 
 1. **Do NOT** open a public issue for security vulnerabilities
 2. Send a detailed report to the project maintainers via:
-   - GitHub Security Advisories (preferred)
-   - Direct email to maintainers
+    - GitHub Security Advisories (preferred)
+    - Direct email to maintainers
 
 ### What to Include
 

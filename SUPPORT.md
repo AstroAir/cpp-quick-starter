@@ -22,11 +22,11 @@ Before opening an issue:
 1. Search existing issues to avoid duplicates
 2. Use the appropriate issue template
 3. Provide as much detail as possible:
-   - Operating system and version
-   - Compiler and version
-   - CMake/xmake version
-   - Steps to reproduce
-   - Expected vs actual behavior
+    - Operating system and version
+    - Compiler and version
+    - CMake/xmake version
+    - Steps to reproduce
+    - Expected vs actual behavior
 
 ### Response Time
 
