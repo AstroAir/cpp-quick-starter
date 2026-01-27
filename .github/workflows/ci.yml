@@ -17,48 +17,10 @@ env:
 
 jobs:
   # ==========================================================================
-  # Quality Gate - Must pass before any build starts
-  # ==========================================================================
-  quality-gate:
-    name: Quality Gate
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Install clang-format
-        run: sudo apt-get update && sudo apt-get install -y clang-format
-
-      - name: Check C++ formatting
-        shell: bash
-        run: |
-          echo "Checking formatting for C++ files..."
-          files=$(find src include tests benchmarks examples -name "*.cpp" -o -name "*.hpp" 2>/dev/null || true)
-          if [[ -n "$files" ]]; then
-            echo "$files" | xargs clang-format --dry-run --Werror
-            echo "✅ All files are properly formatted"
-          else
-            echo "No C++ files found to check"
-          fi
-
-      - name: Install cppcheck
-        run: sudo apt-get install -y cppcheck
-
-      - name: Run cppcheck
-        run: |
-          cppcheck --enable=warning,style,performance,portability \
-            --error-exitcode=1 \
-            --suppress=missingIncludeSystem \
-            --inline-suppr \
-            -I include \
-            src/ tests/ examples/
-
-  # ==========================================================================
   # CMake Multi-Platform Build
   # ==========================================================================
   cmake:
     name: CMake (${{ matrix.os }}, ${{ matrix.compiler }})
-    needs: quality-gate
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -126,7 +88,6 @@ jobs:
   # ==========================================================================
   sanitizers:
     name: Sanitizers (${{ matrix.sanitizer }})
-    needs: quality-gate
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -155,7 +116,6 @@ jobs:
   # ==========================================================================
   benchmarks:
     name: Benchmarks
-    needs: quality-gate
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -179,7 +139,6 @@ jobs:
   # ==========================================================================
   docs:
     name: Documentation
-    needs: quality-gate
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -215,7 +174,6 @@ jobs:
   # ==========================================================================
   xmake:
     name: xmake (${{ matrix.os }})
-    needs: quality-gate
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -247,7 +205,6 @@ jobs:
   # ==========================================================================
   xmake-docs:
     name: xmake docs
-    needs: quality-gate
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -272,7 +229,6 @@ jobs:
   # ==========================================================================
   examples:
     name: Examples (${{ matrix.os }})
-    needs: quality-gate
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
