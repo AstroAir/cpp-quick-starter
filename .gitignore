@@ -86,3 +86,5 @@ coverage/
 
 ## Documentation site output (MkDocs)
 site/
+
+__pycache__/
