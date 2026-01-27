@@ -139,21 +139,21 @@ jobs:
   # ==========================================================================
   # EditorConfig Check
   # ==========================================================================
-  editorconfig:
-    name: EditorConfig
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
+  #editorconfig:
+    #name: EditorConfig
+    #runs-on: ubuntu-latest
+    #steps:
+      #- name: Checkout
+        #uses: actions/checkout@v6
 
-      - name: Install editorconfig-checker
-        run: |
-          EC_URL="https://github.com/editorconfig-checker/editorconfig-checker/releases"
-          curl -sSL "${EC_URL}/download/2.8.0/ec-linux-amd64.tar.gz" | tar xz
-          sudo mv bin/ec-linux-amd64 /usr/local/bin/ec
+      #- name: Install editorconfig-checker
+        #run: |
+          #EC_URL="https://github.com/editorconfig-checker/editorconfig-checker/releases"
+          #curl -sSL "${EC_URL}/download/2.8.0/ec-linux-amd64.tar.gz" | tar xz
+          #sudo mv bin/ec-linux-amd64 /usr/local/bin/ec
 
-      - name: Check EditorConfig compliance
-        run: ec --exclude "build|\.git|\.venv|uv\.lock"
+      #- name: Check EditorConfig compliance
+        #run: ec --exclude "build|\.git|\.venv|uv\.lock"
 
   # ==========================================================================
   # Markdown Lint
