@@ -2,10 +2,9 @@
 name: CI
 
 'on':
-  push:
-    branches:
-      - master
-  pull_request:
+  workflow_run:
+    workflows: ["Code Quality"]
+    types: [completed]
   workflow_dispatch:
 
 concurrency:
@@ -21,6 +20,7 @@ jobs:
   # ==========================================================================
   cmake:
     name: CMake (${{ matrix.os }}, ${{ matrix.compiler }})
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -88,6 +88,7 @@ jobs:
   # ==========================================================================
   sanitizers:
     name: Sanitizers (${{ matrix.sanitizer }})
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -116,6 +117,7 @@ jobs:
   # ==========================================================================
   benchmarks:
     name: Benchmarks
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -139,6 +141,7 @@ jobs:
   # ==========================================================================
   docs:
     name: Documentation
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -174,6 +177,7 @@ jobs:
   # ==========================================================================
   xmake:
     name: xmake (${{ matrix.os }})
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -205,6 +209,7 @@ jobs:
   # ==========================================================================
   xmake-docs:
     name: xmake docs
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -229,6 +234,7 @@ jobs:
   # ==========================================================================
   examples:
     name: Examples (${{ matrix.os }})
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
