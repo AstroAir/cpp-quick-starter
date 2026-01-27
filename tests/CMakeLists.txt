@@ -43,3 +43,9 @@ target_link_libraries(integration_tests PRIVATE ${_gtest_target})
 gtest_discover_tests(integration_tests
   DISCOVERY_MODE PRE_TEST
 )
+
+if(CPP_QUICK_STARTER_ENABLE_SANITIZERS)
+  include(Sanitizers)
+  enable_sanitizers(unit_tests)
+  enable_sanitizers(integration_tests)
+endif()

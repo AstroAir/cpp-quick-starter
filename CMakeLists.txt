@@ -69,6 +69,10 @@ endif()
 add_executable(cpp_quick_starter_app src/main.cpp)
 target_link_libraries(cpp_quick_starter_app PRIVATE cpp_quick_starter::cpp_quick_starter)
 
+if(CPP_QUICK_STARTER_ENABLE_SANITIZERS)
+  enable_sanitizers(cpp_quick_starter_app)
+endif()
+
 if(CPP_QUICK_STARTER_BUILD_EXAMPLES)
   add_executable(example_01 examples/example_01.cpp)
   target_link_libraries(example_01 PRIVATE cpp_quick_starter::cpp_quick_starter)
